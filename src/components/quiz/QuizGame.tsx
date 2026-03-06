@@ -1,4 +1,13 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
+
+function shuffleArray<T>(arr: T[]): T[] {
+  const a = [...arr]
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[a[i], a[j]] = [a[j], a[i]]
+  }
+  return a
+}
 import { useNavigate, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronRight, Clock, CheckCircle, XCircle } from 'lucide-react'
@@ -88,7 +97,7 @@ export default function QuizGame() {
   // Init ranking items
   useEffect(() => {
     if (vraag?.type === 'ranking' && vraag.opties) {
-      setRankItems([...vraag.opties])
+      setRankItems(shuffleArray(vraag.opties))
     }
     setSelected(null)
     setSubmitted(false)
