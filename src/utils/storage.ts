@@ -4,6 +4,7 @@ const KEYS = {
   scores: 'candor_quiz_scores',
   today: 'candor_today_count',
   leaderboard: 'candor_leaderboard',
+  bookmarks: 'candor_bookmarks',
 } as const
 
 // Quiz scores
@@ -58,8 +59,35 @@ export function getLeaderboard(): LeaderboardEntry[] {
 export function addLeaderboardEntry(entry: LeaderboardEntry): void {
   const board = getLeaderboard()
   board.push(entry)
-  board.sort((a, b) => b.score / b.totaal - a.score / a.totaal)
+  board.sort((a, b) => (b.punten / (b.maxPunten || 1)) - (a.punten / (a.maxPunten || 1)))
   localStorage.setItem(KEYS.leaderboard, JSON.stringify(board.slice(0, 10)))
+}
+
+// Bookmarks
+export function getBookmarks(): string[] {
+  try {
+    return JSON.parse(localStorage.getItem(KEYS.bookmarks) ?? '[]')
+  } catch {
+    return []
+  }
+}
+
+export function toggleBookmark(id: string): boolean {
+  const bookmarks = getBookmarks()
+  const idx = bookmarks.indexOf(id)
+  if (idx === -1) {
+    bookmarks.push(id)
+    localStorage.setItem(KEYS.bookmarks, JSON.stringify(bookmarks))
+    return true
+  } else {
+    bookmarks.splice(idx, 1)
+    localStorage.setItem(KEYS.bookmarks, JSON.stringify(bookmarks))
+    return false
+  }
+}
+
+export function isBookmarked(id: string): boolean {
+  return getBookmarks().includes(id)
 }
 
 // Statistieken

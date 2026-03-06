@@ -10,7 +10,7 @@ function shuffleArray<T>(arr: T[]): T[] {
 }
 import { useNavigate, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronRight, Clock, CheckCircle, XCircle } from 'lucide-react'
+import { ChevronRight, Clock, CheckCircle, XCircle, Bookmark, BookmarkCheck } from 'lucide-react'
 import {
   DndContext,
   closestCenter,
@@ -32,7 +32,7 @@ import { CSS } from '@dnd-kit/utilities'
 import { GripVertical } from 'lucide-react'
 import { generateQuestions } from '../../data/quizGenerator'
 import type { QuizConfig, QuizQuestion, QuizAntwoord, QuizResultaat } from '../../data/types'
-import { saveScore, addTodayCount } from '../../utils/storage'
+import { saveScore, addTodayCount, toggleBookmark, isBookmarked } from '../../utils/storage'
 
 // --- Sortable item ---
 function SortableItem({ id, label }: { id: string; label: string }) {
@@ -62,6 +62,8 @@ function arraysEqual(a: string[], b: string[]) {
   return a.length === b.length && a.every((v, i) => v === b[i])
 }
 
+const PUNTEN: Record<string, number> = { Easy: 1, Medium: 2, Hard: 3 }
+
 export default function QuizGame() {
   const navigate = useNavigate()
   const location = useLocation()
@@ -82,6 +84,7 @@ export default function QuizGame() {
   const [rankItems, setRankItems] = useState<string[]>([])
   const [schatting, setSchatting] = useState('')
   const [timer, setTimer] = useState(30)
+  const [bookmarked, setBookmarked] = useState(false)
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   const sensors = useSensors(
@@ -103,6 +106,7 @@ export default function QuizGame() {
     setSubmitted(false)
     setSchatting('')
     setTimer(30)
+    setBookmarked(vraag ? isBookmarked(vraag.id) : false)
   }, [current, vraag])
 
   // Timer
@@ -152,6 +156,7 @@ export default function QuizGame() {
       correctAntwoord: vraag.correctAntwoord,
       uitleg: vraag.uitleg,
       categorie: vraag.categorie,
+      punten: correct ? (PUNTEN[vraag.moeilijkheid] ?? 1) : 0,
     }
     setAntwoorden(prev => [...prev, antwoord])
   }, [vraag, submitted, selected, schatting, rankItems])
@@ -161,12 +166,16 @@ export default function QuizGame() {
       // Save & navigate to result
       const alleAntwoorden = antwoorden
       const score = alleAntwoorden.filter(a => a.correct).length
+      const totalePunten = alleAntwoorden.reduce((sum, a) => sum + a.punten, 0)
+      const maxPunten = questions.reduce((sum, q) => sum + (PUNTEN[q.moeilijkheid] ?? 1), 0)
       addTodayCount(questions.length)
 
       const resultaat: QuizResultaat = {
         id: Date.now().toString(),
         score,
         totaal: questions.length,
+        totalePunten,
+        maxPunten,
         antwoorden: alleAntwoorden,
         datum: new Date().toISOString(),
         config,
@@ -385,11 +394,18 @@ export default function QuizGame() {
                 ? <CheckCircle size={20} className="text-candor-green shrink-0 mt-0.5" />
                 : <XCircle size={20} className="text-candor-red shrink-0 mt-0.5" />
               }
-              <div>
+              <div className="flex-1">
                 <div className={`font-bold text-sm mb-1 ${isCorrect ? 'text-candor-green' : 'text-candor-red'}`}>
                   {isCorrect ? 'Correct!' : 'Fout!'}
                 </div>
                 <p className="text-white/70 text-sm leading-relaxed">{vraag.uitleg}</p>
+                <button
+                  onClick={() => setBookmarked(toggleBookmark(vraag.id))}
+                  className={`flex items-center gap-1.5 text-xs mt-3 transition-colors ${bookmarked ? 'text-candor-orange' : 'text-white/30 hover:text-white/60'}`}
+                >
+                  {bookmarked ? <BookmarkCheck size={13} /> : <Bookmark size={13} />}
+                  {bookmarked ? 'Gebookmarkt' : 'Bewaar voor later'}
+                </button>
               </div>
             </div>
           </motion.div>

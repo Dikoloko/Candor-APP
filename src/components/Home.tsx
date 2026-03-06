@@ -1,7 +1,9 @@
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Target, Zap, BarChart2, Database, TrendingUp, Award, BookOpen } from 'lucide-react'
+import { Target, Zap, BarChart2, Database, TrendingUp, Award, BookOpen, Globe } from 'lucide-react'
 import { getTodayCount, getStats, getLeaderboard } from '../utils/storage'
+import { isSupabaseConfigured, getRemoteLeaderboard, type RemoteEntry } from '../utils/supabase'
 
 const cards = [
   {
@@ -61,6 +63,12 @@ export default function Home() {
   const todayCount = getTodayCount()
   const stats = getStats()
   const leaderboard = getLeaderboard()
+  const [remoteBoard, setRemoteBoard] = useState<RemoteEntry[]>([])
+
+  useEffect(() => {
+    if (!isSupabaseConfigured) return
+    getRemoteLeaderboard().then(setRemoteBoard).catch(() => {})
+  }, [])
 
   return (
     <div className="px-4 pt-2 pb-4 max-w-lg mx-auto">
@@ -128,7 +136,7 @@ export default function Home() {
       </motion.div>
 
       {/* Leaderboard */}
-      {leaderboard.length > 0 && (
+      {(remoteBoard.length > 0 || leaderboard.length > 0) && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -136,16 +144,21 @@ export default function Home() {
           className="card p-4"
         >
           <div className="flex items-center gap-2 mb-3">
-            <Award size={16} className="text-candor-orange" />
-            <h2 className="font-semibold text-white text-sm">Leaderboard</h2>
+            {remoteBoard.length > 0
+              ? <Globe size={16} className="text-candor-teal" />
+              : <Award size={16} className="text-candor-orange" />
+            }
+            <h2 className="font-semibold text-white text-sm">
+              {remoteBoard.length > 0 ? 'Gedeeld leaderboard' : 'Leaderboard'}
+            </h2>
           </div>
           <div className="space-y-2">
-            {leaderboard.slice(0, 5).map((entry, i) => (
+            {(remoteBoard.length > 0 ? remoteBoard : leaderboard).slice(0, 5).map((entry, i) => (
               <div key={i} className="flex items-center gap-3">
                 <span className="num text-candor-teal/70 text-xs w-4">{i + 1}</span>
                 <span className="flex-1 text-white/80 text-sm truncate">{entry.naam}</span>
-                <span className="num text-white font-semibold text-sm">
-                  {Math.round((entry.score / entry.totaal) * 100)}%
+                <span className="num text-candor-orange font-bold text-sm">
+                  {entry.punten} pt
                 </span>
               </div>
             ))}

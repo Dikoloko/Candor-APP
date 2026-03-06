@@ -1,9 +1,10 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Target, Timer } from 'lucide-react'
+import { Target, Timer, Bookmark } from 'lucide-react'
 import type { QuizConfig, QuizCategorie, QuizMoeilijkheid } from '../../data/types'
 import { alleCategorieen } from '../../data/quizGenerator'
+import { getBookmarks } from '../../utils/storage'
 
 const aantalOpties = [5, 10, 15, 20]
 const moeilijkhedenOpties: Array<QuizMoeilijkheid | 'Alles'> = ['Alles', 'Easy', 'Medium', 'Hard']
@@ -11,9 +12,11 @@ const scopeOpties: QuizConfig['scope'][] = ['Alles', 'Alleen Candor', 'Alleen Co
 
 export default function QuizSetup() {
   const navigate = useNavigate()
+  const location = useLocation()
+  const [bookmarks] = useState(() => getBookmarks())
   const [config, setConfig] = useState<QuizConfig>({
     aantalVragen: 10,
-    categorieen: [],
+    categorieen: (location.state?.presetCategorieen as QuizCategorie[]) ?? [],
     moeilijkheid: 'Alles',
     scope: 'Alles',
     metTimer: false,
@@ -27,6 +30,13 @@ export default function QuizSetup() {
         : [...c.categorieen, cat],
     }))
   }
+
+  // Direct start bookmark quiz vanuit QuizResult
+  useEffect(() => {
+    if (location.state?.startBookmarkQuiz && bookmarks.length > 0) {
+      navigate('/quiz/game', { state: { config: { ...config, bookmarkIds: bookmarks } } })
+    }
+  }, [])
 
   function startQuiz() {
     navigate('/quiz/game', { state: { config } })
@@ -47,6 +57,27 @@ export default function QuizSetup() {
       </motion.div>
 
       <div className="space-y-5">
+        {/* Bookmark quiz */}
+        {bookmarks.length > 0 && (
+          <div className="card p-4 border border-candor-orange/40">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <Bookmark size={18} className="text-candor-orange shrink-0" />
+                <div>
+                  <div className="text-sm font-semibold text-white">{bookmarks.length} gebookmarkte vragen</div>
+                  <div className="text-xs text-white/40">Oefen je moeilijke vragen</div>
+                </div>
+              </div>
+              <button
+                onClick={() => navigate('/quiz/game', { state: { config: { ...config, bookmarkIds: bookmarks } } })}
+                className="btn-primary text-xs py-2 px-3 shrink-0"
+              >
+                Start
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Aantal vragen */}
         <div className="card p-4">
           <h2 className="text-sm font-semibold text-white/70 mb-3 uppercase tracking-wide">Aantal vragen</h2>

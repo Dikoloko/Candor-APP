@@ -113,6 +113,7 @@ export interface QuizConfig {
   moeilijkheid: QuizMoeilijkheid | 'Alles'
   scope: 'Alleen Candor' | 'Alleen Concurrenten' | 'Alles'
   metTimer: boolean
+  bookmarkIds?: string[]
 }
 
 export interface QuizAntwoord {
@@ -123,12 +124,15 @@ export interface QuizAntwoord {
   correctAntwoord: string | number | string[]
   uitleg: string
   categorie: QuizCategorie
+  punten: number
 }
 
 export interface QuizResultaat {
   id: string
   score: number
   totaal: number
+  totalePunten: number
+  maxPunten: number
   antwoorden: QuizAntwoord[]
   datum: string
   config: QuizConfig
@@ -138,5 +142,7 @@ export interface LeaderboardEntry {
   naam: string
   score: number
   totaal: number
+  punten: number
+  maxPunten: number
   datum: string
 }

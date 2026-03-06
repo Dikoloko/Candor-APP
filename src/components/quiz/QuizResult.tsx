@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { RotateCcw, Share2, Trophy, XCircle, CheckCircle, ChevronDown, ChevronUp } from 'lucide-react'
+import { RotateCcw, Share2, Trophy, XCircle, CheckCircle, ChevronDown, ChevronUp, Bookmark, AlertTriangle } from 'lucide-react'
 import type { QuizResultaat, QuizCategorie } from '../../data/types'
-import { addLeaderboardEntry } from '../../utils/storage'
+import { addLeaderboardEntry, getBookmarks } from '../../utils/storage'
+import { isSupabaseConfigured, addRemoteEntry } from '../../utils/supabase'
 
 export default function QuizResult() {
   const navigate = useNavigate()
@@ -49,6 +50,12 @@ export default function QuizResult() {
   const kleur = pct >= 80 ? 'text-candor-green' : pct >= 60 ? 'text-candor-orange' : 'text-candor-red'
   const emoji = pct >= 80 ? '🏆' : pct >= 60 ? '👍' : '📚'
 
+  const zwakkeCategorieen = Object.entries(categorieStats)
+    .filter(([, stat]) => stat.correct / stat.totaal < 0.6)
+    .map(([cat]) => cat as QuizCategorie)
+
+  const bookmarkCount = getBookmarks().length
+
   function handleDeel() {
     const tekst = `Candor Competitor Quiz: ${resultaat!.score}/${resultaat!.totaal} (${pct}%) — ${emoji}`
     if (navigator.share) {
@@ -64,8 +71,20 @@ export default function QuizResult() {
       naam: naam.trim(),
       score: resultaat!.score,
       totaal: resultaat!.totaal,
+      punten: resultaat!.totalePunten,
+      maxPunten: resultaat!.maxPunten,
       datum: resultaat!.datum,
     })
+    if (isSupabaseConfigured) {
+      addRemoteEntry({
+        naam: naam.trim(),
+        score: resultaat!.score,
+        totaal: resultaat!.totaal,
+        punten: resultaat!.totalePunten,
+        max_punten: resultaat!.maxPunten,
+        datum: resultaat!.datum,
+      })
+    }
     setNaamOpgeslagen(true)
   }
 
@@ -80,7 +99,10 @@ export default function QuizResult() {
         <div className="text-4xl mb-2">{emoji}</div>
         <div className={`num text-6xl font-bold ${kleur} mb-1`}>{displayScore}%</div>
         <div className="text-white/50 text-sm mb-1">
-          {resultaat.score} van {resultaat.totaal} correct
+          {resultaat.score}/{resultaat.totaal} correct
+        </div>
+        <div className="num text-candor-orange font-bold text-lg">
+          {resultaat.totalePunten} / {resultaat.maxPunten} punten
         </div>
         <div className="text-white/30 text-xs">
           {new Date(resultaat.datum).toLocaleDateString('nl-BE', { day: 'numeric', month: 'long', year: 'numeric' })}
@@ -138,6 +160,53 @@ export default function QuizResult() {
                 </div>
               )
             })}
+          </div>
+        </motion.div>
+      )}
+
+      {/* Zwakke punten */}
+      {zwakkeCategorieen.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.25 }}
+          className="card p-4 mb-4 border border-candor-orange/30"
+        >
+          <div className="flex items-center gap-2 mb-2">
+            <AlertTriangle size={15} className="text-candor-orange shrink-0" />
+            <h2 className="text-sm font-semibold text-candor-orange uppercase tracking-wide">Verbeterpunten</h2>
+          </div>
+          <p className="text-white/60 text-xs mb-3">
+            Je scoort laag op: <span className="text-white/80">{zwakkeCategorieen.join(', ')}</span>
+          </p>
+          <button
+            onClick={() => navigate('/quiz', { state: { presetCategorieen: zwakkeCategorieen } })}
+            className="btn-primary w-full text-sm py-2.5"
+          >
+            Oefen zwakke categorieën
+          </button>
+        </motion.div>
+      )}
+
+      {/* Bookmark quiz */}
+      {bookmarkCount > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.28 }}
+          className="card p-4 mb-4 border border-candor-orange/20"
+        >
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <Bookmark size={16} className="text-candor-orange shrink-0" />
+              <p className="text-white/70 text-sm">{bookmarkCount} vragen gebookmarkt</p>
+            </div>
+            <button
+              onClick={() => navigate('/quiz', { state: { startBookmarkQuiz: true } })}
+              className="btn-ghost text-xs py-1.5 px-3 shrink-0"
+            >
+              Start
+            </button>
           </div>
         </motion.div>
       )}

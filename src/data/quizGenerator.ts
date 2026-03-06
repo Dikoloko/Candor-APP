@@ -656,6 +656,12 @@ export const alleVragen: QuizQuestion[] = [
 export function generateQuestions(config: QuizConfig): QuizQuestion[] {
   let pool = [...alleVragen]
 
+  // Bookmark quiz: bypass andere filters, gebruik alleen gebookmarkte vragen
+  if (config.bookmarkIds && config.bookmarkIds.length > 0) {
+    pool = pool.filter(q => config.bookmarkIds!.includes(q.id))
+    return shuffle(pool).slice(0, Math.min(config.aantalVragen, pool.length))
+  }
+
   // Filter op moeilijkheid
   if (config.moeilijkheid !== 'Alles') {
     pool = pool.filter(q => q.moeilijkheid === config.moeilijkheid)
