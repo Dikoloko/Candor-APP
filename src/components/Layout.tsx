@@ -31,8 +31,8 @@ export default function Layout({ children }: LayoutProps) {
         }}
       />
       {/* Top bar */}
-      <header className="flex items-center justify-between px-4 pt-4 pb-2 safe-top shrink-0">
-        <img src="/candor_white.png" alt="Candor" className="h-7 w-auto" />
+      <header className="flex items-center justify-between px-4 md:px-8 pt-4 pb-2 safe-top shrink-0">
+        <img src="/candor_white.png" alt="Candor" className="h-7 md:h-9 w-auto" />
       </header>
 
       {/* Page content */}
