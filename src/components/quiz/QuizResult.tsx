@@ -57,7 +57,7 @@ export default function QuizResult() {
   const bookmarkCount = getBookmarks().length
 
   function handleDeel() {
-    const tekst = `Candor Competitor Quiz: ${resultaat!.score}/${resultaat!.totaal} (${pct}%) — ${emoji}`
+    const tekst = `Candor Competitor Quiz: ${resultaat!.score}/${resultaat!.totaal} (${pct}%) · ${resultaat!.totalePunten}/${resultaat!.maxPunten} punten — ${emoji}`
     if (navigator.share) {
       navigator.share({ title: 'Candor Quiz Resultaat', text: tekst })
     } else {

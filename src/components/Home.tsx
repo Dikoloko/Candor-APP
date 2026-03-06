@@ -158,7 +158,7 @@ export default function Home() {
                 <span className="num text-candor-teal/70 text-xs w-4">{i + 1}</span>
                 <span className="flex-1 text-white/80 text-sm truncate">{entry.naam}</span>
                 <span className="num text-candor-orange font-bold text-sm">
-                  {entry.punten} pt
+                  {entry.punten ?? '—'} pt
                 </span>
               </div>
             ))}
@@ -166,7 +166,7 @@ export default function Home() {
         </motion.div>
       )}
 
-      {leaderboard.length === 0 && (
+      {leaderboard.length === 0 && remoteBoard.length === 0 && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
