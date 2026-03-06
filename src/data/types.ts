@@ -110,6 +110,7 @@ export interface QuizQuestion {
 export interface QuizConfig {
   aantalVragen: number
   categorieen: QuizCategorie[]
+  vraagTypes: QuizVraagType[]
   moeilijkheid: QuizMoeilijkheid | 'Alles'
   scope: 'Alleen Candor' | 'Alleen Concurrenten' | 'Alles'
   metTimer: boolean

@@ -2,13 +2,21 @@ import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Target, Timer, Bookmark } from 'lucide-react'
-import type { QuizConfig, QuizCategorie, QuizMoeilijkheid } from '../../data/types'
+import type { QuizConfig, QuizCategorie, QuizMoeilijkheid, QuizVraagType } from '../../data/types'
 import { alleCategorieen } from '../../data/quizGenerator'
 import { getBookmarks } from '../../utils/storage'
 
 const aantalOpties = [5, 10, 15, 20]
 const moeilijkhedenOpties: Array<QuizMoeilijkheid | 'Alles'> = ['Alles', 'Easy', 'Medium', 'Hard']
 const scopeOpties: QuizConfig['scope'][] = ['Alles', 'Alleen Candor', 'Alleen Concurrenten']
+
+const vraagTypeLabels: Record<QuizVraagType, string> = {
+  multiple_choice: 'Multiple Choice',
+  true_false: 'Waar / Niet waar',
+  schatting: 'Schatting',
+  ranking: 'Rangschikking',
+}
+const alleVraagTypes: QuizVraagType[] = ['multiple_choice', 'true_false', 'schatting', 'ranking']
 
 export default function QuizSetup() {
   const navigate = useNavigate()
@@ -17,6 +25,7 @@ export default function QuizSetup() {
   const [config, setConfig] = useState<QuizConfig>({
     aantalVragen: 10,
     categorieen: (location.state?.presetCategorieen as QuizCategorie[]) ?? [],
+    vraagTypes: [],
     moeilijkheid: 'Alles',
     scope: 'Alles',
     metTimer: false,
@@ -28,6 +37,15 @@ export default function QuizSetup() {
       categorieen: c.categorieen.includes(cat)
         ? c.categorieen.filter(x => x !== cat)
         : [...c.categorieen, cat],
+    }))
+  }
+
+  function toggleVraagType(type: QuizVraagType) {
+    setConfig(c => ({
+      ...c,
+      vraagTypes: c.vraagTypes.includes(type)
+        ? c.vraagTypes.filter(x => x !== type)
+        : [...c.vraagTypes, type],
     }))
   }
 
@@ -114,6 +132,27 @@ export default function QuizSetup() {
                 }`}
               >
                 {cat}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Vraagtype */}
+        <div className="card p-4">
+          <h2 className="text-sm font-semibold text-white/70 mb-1 uppercase tracking-wide">Vraagtype</h2>
+          <p className="text-white/40 text-xs mb-3">Leeg = alle types door elkaar</p>
+          <div className="flex flex-wrap gap-2">
+            {alleVraagTypes.map(type => (
+              <button
+                key={type}
+                onClick={() => toggleVraagType(type)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+                  config.vraagTypes.includes(type)
+                    ? 'bg-candor-teal text-white'
+                    : 'bg-white/5 text-white/60 border border-candor-border'
+                }`}
+              >
+                {vraagTypeLabels[type]}
               </button>
             ))}
           </div>

@@ -672,6 +672,11 @@ export function generateQuestions(config: QuizConfig): QuizQuestion[] {
     pool = pool.filter(q => config.categorieen.includes(q.categorie))
   }
 
+  // Filter op vraagtype
+  if (config.vraagTypes.length > 0) {
+    pool = pool.filter(q => config.vraagTypes.includes(q.type))
+  }
+
   // Filter op scope
   if (config.scope === 'Alleen Candor') {
     pool = pool.filter(q => q.projectIds.length === 0 || q.projectIds.some(id => id === 'tondo'))
