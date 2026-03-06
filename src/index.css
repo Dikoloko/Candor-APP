@@ -1,0 +1,81 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    -webkit-tap-highlight-color: transparent;
+    box-sizing: border-box;
+  }
+
+  html {
+    font-family: 'Ubuntu', sans-serif;
+    background-color: #0d1b2a;
+    color: #e2eaf4;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100dvh;
+    background-color: #0d1b2a;
+    overscroll-behavior: none;
+  }
+
+  #root {
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  ::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #0d1b2a;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #29AAE2;
+    border-radius: 2px;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-candor-card border border-candor-border rounded-2xl shadow-card;
+  }
+
+  .btn-primary {
+    @apply bg-candor-teal text-white font-semibold py-3 px-6 rounded-xl
+           active:scale-95 transition-transform duration-100
+           disabled:opacity-40 disabled:cursor-not-allowed;
+  }
+
+  .btn-ghost {
+    @apply border border-candor-border text-candor-teal font-semibold py-3 px-6 rounded-xl
+           active:scale-95 transition-transform duration-100;
+  }
+
+  .badge-candor {
+    @apply bg-candor-teal/20 text-candor-teal text-xs font-semibold px-2 py-0.5 rounded-full border border-candor-teal/30;
+  }
+
+  .badge-concurrent {
+    @apply bg-white/10 text-white/60 text-xs font-semibold px-2 py-0.5 rounded-full border border-white/10;
+  }
+
+  .num {
+    font-family: 'JetBrains Mono', monospace;
+  }
+}
+
+/* Safe area insets for mobile */
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.safe-top {
+  padding-top: env(safe-area-inset-top, 0px);
+}
