@@ -18,7 +18,13 @@ export default function Layout({ children }: LayoutProps) {
   const location = useLocation()
 
   return (
-    <div className="flex flex-col min-h-dvh bg-candor-bg">
+    <div className="flex flex-col min-h-dvh bg-candor-bg relative overflow-hidden">
+      {/* Achtergrond polygon */}
+      <img
+        src="/candor-polygon_bg.svg"
+        aria-hidden="true"
+        className="pointer-events-none select-none fixed top-0 right-0 w-[420px] max-w-[70vw] opacity-[0.06] translate-x-1/4 -translate-y-1/4"
+      />
       {/* Top bar */}
       <header className="flex items-center justify-between px-4 pt-4 pb-2 safe-top shrink-0">
         <img src="/candor_white.png" alt="Candor" className="h-7 w-auto" />
