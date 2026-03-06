@@ -1,4 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <rect width="32" height="32" rx="8" fill="#29AAE2"/>
-  <text x="16" y="22" font-family="Ubuntu, sans-serif" font-size="16" font-weight="700" text-anchor="middle" fill="white">C</text>
+  <!-- Top facets -->
+  <polygon points="16,2 26,11 16,14" fill="#96d3ea"/>
+  <polygon points="16,2 6,11 16,14" fill="#29AAE2"/>
+  <!-- Left/right middle -->
+  <polygon points="6,11 16,14 6,21" fill="#2d598e"/>
+  <polygon points="26,11 16,14 26,21" fill="#1a3356"/>
+  <!-- Lower middle -->
+  <polygon points="16,14 6,21 16,24" fill="#29AAE2"/>
+  <polygon points="16,14 26,21 16,24" fill="#2d598e"/>
+  <!-- Bottom -->
+  <polygon points="6,21 16,24 16,30" fill="#1a3356"/>
+  <polygon points="26,21 16,24 16,30" fill="#2d598e"/>
 </svg>

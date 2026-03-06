@@ -79,9 +79,8 @@ export default function Home() {
         transition={{ duration: 0.3 }}
         className="mb-6"
       >
-        <h1 className="text-2xl font-bold text-white mb-1">
-          Candor Competitor Quiz
-        </h1>
+        <img src="/candor_white.png" alt="Candor" className="h-9 w-auto mb-2" />
+        <p className="text-white font-semibold text-base mb-0.5">Competitor Quiz</p>
         <p className="text-white/50 text-sm">
           Ken je de Gentse studentenmarkt van binnen en buiten?
         </p>

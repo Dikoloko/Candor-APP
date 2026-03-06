@@ -21,12 +21,7 @@ export default function Layout({ children }: LayoutProps) {
     <div className="flex flex-col min-h-dvh bg-candor-bg">
       {/* Top bar */}
       <header className="flex items-center justify-between px-4 pt-4 pb-2 safe-top shrink-0">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-candor-teal flex items-center justify-center">
-            <span className="text-white font-bold text-sm">C</span>
-          </div>
-          <span className="font-semibold text-white/90 text-sm tracking-wide">CANDOR QUIZ</span>
-        </div>
+        <img src="/candor_white.png" alt="Candor" className="h-7 w-auto" />
       </header>
 
       {/* Page content */}
