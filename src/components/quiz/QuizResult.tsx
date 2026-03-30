@@ -59,14 +59,21 @@ export default function QuizResult() {
   function handleDeel() {
     const tekst = `Candor Competitor Quiz: ${resultaat!.score}/${resultaat!.totaal} (${pct}%) · ${resultaat!.totalePunten}/${resultaat!.maxPunten} punten — ${emoji}`
     if (navigator.share) {
-      navigator.share({ title: 'Candor Quiz Resultaat', text: tekst })
+      navigator.share({ title: 'Candor Quiz Resultaat', text: tekst }).catch(() => {
+        // User cancelled share dialog or share failed — fall back to clipboard
+        navigator.clipboard.writeText(tekst)
+          .then(() => alert('Gekopieerd naar klembord!'))
+          .catch(() => alert('Kon niet kopiëren. Kopieer handmatig: ' + tekst))
+      })
     } else {
-      navigator.clipboard.writeText(tekst).then(() => alert('Gekopieerd naar klembord!'))
+      navigator.clipboard.writeText(tekst)
+        .then(() => alert('Gekopieerd naar klembord!'))
+        .catch(() => alert('Kon niet kopiëren. Kopieer handmatig: ' + tekst))
     }
   }
 
   function slaOpNaam() {
-    if (!naam.trim()) return
+    if (!naam.trim() || naam.trim().length > 40) return
     addLeaderboardEntry({
       naam: naam.trim(),
       score: resultaat!.score,
@@ -115,6 +122,7 @@ export default function QuizResult() {
               type="text"
               placeholder="Jouw naam voor leaderboard"
               value={naam}
+              maxLength={40}
               onChange={e => setNaam(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && slaOpNaam()}
               className="flex-1 bg-white/5 border border-candor-border rounded-xl px-3 py-2 text-white text-sm outline-none focus:border-candor-teal"

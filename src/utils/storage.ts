@@ -17,10 +17,14 @@ export function getScores(): QuizResultaat[] {
 }
 
 export function saveScore(result: QuizResultaat): void {
-  const scores = getScores()
-  scores.unshift(result)
-  // Bewaar max 50 resultaten
-  localStorage.setItem(KEYS.scores, JSON.stringify(scores.slice(0, 50)))
+  try {
+    const scores = getScores()
+    scores.unshift(result)
+    // Bewaar max 50 resultaten
+    localStorage.setItem(KEYS.scores, JSON.stringify(scores.slice(0, 50)))
+  } catch {
+    // localStorage quota exceeded — score gaat verloren maar app blijft werken
+  }
 }
 
 // Dagelijkse teller
